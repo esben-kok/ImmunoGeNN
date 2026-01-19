@@ -1,6 +1,11 @@
+import sys
+from pathlib import Path
+
+# Add current directory to path so src can be imported
+sys.path.insert(0, str(Path(__file__).parent))
+
 import argparse
 import os
-import sys
 import time
 
 import biolib
@@ -16,6 +21,11 @@ import src.deimm
 import copy
 import os
 import numpy as np
+
+import src.mutation_editor
+import src.plots_pred
+import src.utils
+import src.deimm
 
 def parse_args():
 
@@ -81,13 +91,13 @@ def parse_args():
         "--filter_variant_esm_rank",
         default=60.0,
         type=float,
-        help="ESM rank threshold for de/immunizing variants (0.0 - 100.0%)",
+        help="ESM rank threshold for de/immunizing variants (0.0 - 100.0%%)",
     )
     parser.add_argument(
         "--filter_variant_pirs_rank",
         default=80.0,
         type=float,
-        help="pIRS rank threshold for de/immunizing variants (0.0 - 100.0%)",
+        help="pIRS rank threshold for de/immunizing variants (0.0 - 100.0%%)",
     )
     parser.add_argument(
         "--ranges_str",
@@ -550,6 +560,41 @@ def pbar_percent(pbar, target_percentage):
 
     pbar.refresh()
 
+def main_cli():
+    """CLI entry point for pip-installed package."""
+    from pathlib import Path
+    import requests
+    import zipfile
+    
+    # Ensure data is available
+    data_dir = Path.home() / ".immunogenn" / "data_record"
+    reference_file = data_dir / "human_references_9mers.pkl.lz4"
+    
+    if not reference_file.exists():
+        print("Downloading required data files...")
+        data_dir.parent.mkdir(parents=True, exist_ok=True)
+        
+        url = "https://github.com/esben-kok/ImmunoGeNN/releases/download/v0.1.0/data_record.zip"
+        zip_path = data_dir.parent / "data_record.zip"
+        
+        response = requests.get(url, stream=True)
+        total_size = int(response.headers.get('content-length', 0))
+        
+        with open(zip_path, 'wb') as f:
+            with tqdm(total=total_size, unit='B', unit_scale=True) as pbar:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    pbar.update(len(chunk))
+        
+        print("Extracting...")
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            z.extractall(data_dir.parent)
+        zip_path.unlink()
+        print(f"Data extracted to {data_dir}\n")
+    
+    # Run main
+    args = parse_args()
+    main(args)
 
 if __name__ == "__main__":
 

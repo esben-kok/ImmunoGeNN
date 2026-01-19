@@ -1,0 +1,2 @@
+[console_scripts]
+immunogenn = run:main_cli

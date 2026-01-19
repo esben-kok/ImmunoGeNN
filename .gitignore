@@ -7,3 +7,5 @@ _old/
 _dev/
 .DS_Store
 test/
+
+test_env/

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "immunogenn"
+version = "0.1.0"
+description = "ImmunoGeNN: Immunogenicity prediction"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pybiolib>=0.1.9",
+    "beautifulsoup4>=4.12.3",
+    "joblib>=1.4.2",
+    "requests>=2.31.0",
+    "tqdm>=4.66.5",
+    "numpy>=1.26.4",
+    "pandas>=2.2.3",
+    "matplotlib>=3.9.2",
+    "scikit-learn>=1.5.2",
+    "scipy>=1.9.0",
+    "plotly>=5.24.1",
+    "lxml>=5.3.0",
+    "lz4>=4.3.3",
+]
+
+[project.scripts]
+immunogenn = "run:main_cli"
+
+[tool.setuptools]
+py-modules = ["run"]
+packages = ["src"]
